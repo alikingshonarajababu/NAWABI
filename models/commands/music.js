@@ -3,9 +3,9 @@ const yts = require("yt-search");
 
 // 🔐 Credits Lock Check
 function checkCredits() {
-    const correctCredits = "ARIF-BABU";
+    const correctCredits = "Shaan Khan"; 
     if (module.exports.config.credits !== correctCredits) {
-        throw new Error("❌ Credits Locked By ARIF-BABU");
+        throw new Error("❌ Credits Locked By Shaan Khan");
     }
 }
 
@@ -33,21 +33,21 @@ function getVideoID(url) {
 }
 
 module.exports.config = {
-    name: "yt",
-    version: "1.1.0",
-    credits: "ARIF-BABU", // 🔐 DO NOT CHANGE
+    name: "music", 
+    version: "1.2.1",
+    credits: "Shaan Khan", // 🔐 Locked
     hasPermssion: 0,
     cooldowns: 5,
-    description: "YouTube video ko URL ya name se MP3 me download karein",
+    description: "YouTube official audio downloader",
     commandCategory: "media",
-    usages: "[YouTube URL ya song ka naam]"
+    usages: "[Song name or URL]"
 };
 
 module.exports.run = async function({ api, args, event }) {
     try {
-        checkCredits(); // 🔐 Credits Validation Added
+        checkCredits(); 
 
-        let videoID, searchMsg;
+        let videoID, searchMsg, title;
         const url = args[0];
 
         if (url && (url.includes("youtube.com") || url.includes("youtu.be"))) {
@@ -57,28 +57,38 @@ module.exports.run = async function({ api, args, event }) {
             }
         } else {
             const query = args.join(" ");
-            if (!query) return api.sendMessage("❌ Song ka naam ya YouTube link do!", event.threadID, event.messageID);
+            if (!query) return api.sendMessage("❌ Song ka naam likho!", event.threadID, event.messageID);
 
-            searchMsg = await api.sendMessage(`🔍 Searching: "${query}"`, event.threadID);
+            // Updated Searching Message as per request
+            searchMsg = await api.sendMessage(`✅ Apki Request Jari Hai Please wait....`, event.threadID);
+            
             const result = await yts(query);
-            const videos = result.videos.slice(0, 30);
-            const selected = videos[Math.floor(Math.random() * videos.length)];
+            if (!result.videos.length) {
+                if (searchMsg?.messageID) api.unsendMessage(searchMsg.messageID);
+                return api.sendMessage("❌ Kuch nahi mila!", event.threadID, event.messageID);
+            }
+            
+            // Top/Official result selection
+            const selected = result.videos[0]; 
             videoID = selected.videoId;
+            title = selected.title;
         }
 
-        const { data: { title, downloadLink } } = await axios.get(`${global.apis.diptoApi}/ytDl3?link=${videoID}&format=mp3`);
+        const res = await axios.get(`${global.apis.diptoApi}/ytDl3?link=${videoID}&format=mp3`);
+        const downloadLink = res.data.data.downloadLink;
+        const finalTitle = res.data.data.title || title || "audio";
 
         if (searchMsg?.messageID) api.unsendMessage(searchMsg.messageID);
 
         const shortLink = (await axios.get(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(downloadLink)}`)).data;
 
         return api.sendMessage({
-            body: `🎵 Title: ${title}\n📥 Download: ${shortLink}`,
-            attachment: await getStreamFromURL(downloadLink, `${title}.mp3`)
+            body: `🎵 Title: ${finalTitle}\n📥 Download: ${shortLink}`,
+            attachment: await getStreamFromURL(downloadLink, `${finalTitle}.mp3`)
         }, event.threadID, event.messageID);
 
     } catch (err) {
         console.error(err);
-        return api.sendMessage("⚠️ Error: " + (err.message || "Kuch galat ho gaya!"), event.threadID, event.messageID);
+        return api.sendMessage("⚠️ Error: " + (err.message || "Problem in downloading!"), event.threadID, event.messageID);
     }
 };
