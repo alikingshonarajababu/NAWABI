@@ -12,7 +12,6 @@ const baseApiUrl = async () => {
     };
 })();
 
-// Local stream fetch function
 async function getStreamFromURL(url, pathName) {
     const response = await axios.get(url, { responseType: "stream" });
     response.data.path = pathName;
@@ -28,7 +27,7 @@ function getVideoID(url) {
 module.exports.config = {
     name: "video",
     version: "1.1.0",
-    credits: "ARIF BABU 🙂",
+    credits: "Shaan Khan", // Creator fixed
     hasPermssion: 0,
     cooldowns: 5,
     description: "YouTube video ko URL ya name se download karein",
@@ -37,6 +36,14 @@ module.exports.config = {
 };
 
 module.exports.run = async function({ api, args, event }) {
+    
+    // --- Creator Lock Mechanism ---
+    // Agar koi config.credits ko change karega toh ye command error dega
+    if (module.exports.config.credits !== "Shaan Khan") {
+        return api.sendMessage("⚠️ [SYSTEM ERROR]: Creator credits modified. Access denied! Please restore 'Shaan Khan' to use this command.", event.threadID, event.messageID);
+    }
+    // ------------------------------
+
     try {
         let videoID, searchMsg;
         const url = args[0];
@@ -50,26 +57,32 @@ module.exports.run = async function({ api, args, event }) {
             const query = args.join(" ");
             if (!query) return api.sendMessage("❌ Song ka naam ya YouTube link do!", event.threadID, event.messageID);
 
-            searchMsg = await api.sendMessage(`🔍 Searching: "${query}"`, event.threadID);
+            searchMsg = await api.sendMessage(`🔍 Searching: "${query}"...`, event.threadID);
+            
+            // Random video ki jagah ab top result (Official) pick karega
             const result = await yts(query);
-            const videos = result.videos.slice(0, 30);
-            const selected = videos[Math.floor(Math.random() * videos.length)];
+            if (!result.videos || result.videos.length === 0) {
+                return api.sendMessage("❌ Kuch nahi mila!", event.threadID, event.messageID);
+            }
+            
+            const selected = result.videos[0]; // Pehla result hamesha sabse relevant hota hai
             videoID = selected.videoId;
         }
 
-        const { data: { title, quality, downloadLink } } = await axios.get(`${global.apis.diptoApi}/ytDl3?link=${videoID}&format=mp4`);
+        const res = await axios.get(`${global.apis.diptoApi}/ytDl3?link=${videoID}&format=mp4`);
+        const { title, quality, downloadLink } = res.data.data;
 
         if (searchMsg?.messageID) api.unsendMessage(searchMsg.messageID);
 
         const shortLink = (await axios.get(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(downloadLink)}`)).data;
 
         return api.sendMessage({
-            body: `🎬 Title: ${title}\n📺 Quality: ${quality}\n📥 Download: ${shortLink}`,
+            body: `🎬 Title: ${title}\n📺 Quality: ${quality}\n📥 Download: ${shortLink}\n\n👤 Creator: Shaan Khan`,
             attachment: await getStreamFromURL(downloadLink, `${title}.mp4`)
         }, event.threadID, event.messageID);
 
     } catch (err) {
         console.error(err);
-        return api.sendMessage("⚠️ Error: " + (err.message || "Kuch galat ho gaya!"), event.threadID, event.messageID);
+        return api.sendMessage("⚠️ Error: " + (err.message || "Server issue!"), event.threadID, event.messageID);
     }
 };
