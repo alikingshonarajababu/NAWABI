@@ -18,23 +18,23 @@
         "",
         ""
     ],
-    "BOTOWNER": "†『 ⸙ †ĸɩŋʛ ʋʑʌɩʀ.𝐱͜͡ᴆ 』†",
-    "OWNERLINK": "https://www.facebook.com/share/1GUh85uQDn/",
-    "OWNERID": "61558005913380",
-    "BOTCREATOR": "†『 ⸙ †ĸɩŋʛ 𝚂𝙷𝙰𝙰𝙽.𝐱͜͡ᴆ 』†",
+    "BOTOWNER": "†『 ⸙ †ĸɩŋʛ ali 』†",
+    "OWNERLINK": "https://www.facebook.com/o.x.o.x.837300",
+    "OWNERID": "61551447140312",
+    "BOTCREATOR": "†『 ⸙ †ĸɩŋʛ ali.𝐱͜͡ᴆ 』†",
     "APIKEY": "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",
     "openai": "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",
-    "CREATORLINK": "https://www.facebook.com/profile.php?id=100016828397863",
+    "CREATORLINK": "https://www.facebook.com/o.x.o.x.837300",
     "PERMISSION1": [
-        "61558005913380",
+        "61551447140312",
         "",
         "",
         ""
     ],
     "RestartEvery": 30,
     "ONLY": [
-        "61558005913380",
-        "61558005913380",
+        "61551447140312",
+        "61551447140312",
         ""
     ],
     "PASSWORD": "",
@@ -42,8 +42,8 @@
     "BOTNAME": "➺ 𓆩『 ⸙  𝐁𝐎𝐓 𝐉𝐀𝐍𝐔-2  』𓆪",
     "PREFIX": ".",
     "ADMINBOT": [
-        "61558005913380",
-        "100016828397863",
+        "61551447140312",
+        "61551447140312",
         "",
         "",
         "",
@@ -71,8 +71,8 @@
         ""
     ],
     "GOD": [
-        "61558005913380",
-        "100016828397863"
+        "61551447140312",
+        "61551447140312"
     ],
     "DATABASE": {
         "sqlite": {
